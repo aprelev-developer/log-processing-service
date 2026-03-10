@@ -1,0 +1,26 @@
+parameters:
+    elasticsearch.host: '%env(ELASTICSEARCH_HOST)%'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Domain/Entity/'
+            - '../src/Domain/ValueObject/'
+            - '../src/Application/DTO/'
+            - '../src/Kernel.php'
+
+    App\Infrastructure\Elasticsearch\ElasticsearchClientFactory:
+        arguments:
+            $host: '%elasticsearch.host%'
+
+    Elastic\Elasticsearch\Client:
+        factory: ['@App\Infrastructure\Elasticsearch\ElasticsearchClientFactory', 'create']
+
+    App\Application\Port\LogIndexerInterface:
+        alias: App\Infrastructure\Elasticsearch\ElasticsearchLogIndexer
